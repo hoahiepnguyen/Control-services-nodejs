@@ -9,6 +9,7 @@ const I2C_ADDRESS = 0x68;
 const BUFF_SIZE = 0x02
 
 var data = new Buffer([0x00, 0x00]);
+var RxBuff = new Buffer([0x00, 0x00]);
 
 const i2c1 = i2c.openSync(1)
 
@@ -32,17 +33,18 @@ exports.I2C_Transmit = function(target, command) {
 	})
 }
 
-exports.I2C_Receive = function(buff) {
+exports.I2C_Receive = function() {
 	gpio48.watch((err, value) => {
 		if (err) {
 			throw err;
 		}
 		console.log('Receiving data from Mic-array')
-		i2c1.i2cRead(I2C_ADDRESS, BUFF_SIZE, buff, function(error) {
+		i2c1.i2cRead(I2C_ADDRESS, BUFF_SIZE, RxBuff, function(error) {
 			if(err) {
 				throw err;
 			}
-			console.log(buff)
+			console.log(RxBuff)
 		})
 	})
+	return RxBuff;
 }
