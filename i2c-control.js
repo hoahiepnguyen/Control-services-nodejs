@@ -2,7 +2,7 @@ var dbus = require('dbus')
 var bus = dbus.getBus('system')
 const i2c = require('i2c-bus');
 const gpio = require('onoff').Gpio
-
+const delay = require('delay')
 const pin67 = new gpio(67, 'out');
 // Export gpio48 as an interrupt generating input with a debounceTimeout of 10
 const gpio48 = new gpio(48, 'in', 'rising', {debounceTimeout: 10});
@@ -28,7 +28,7 @@ exports.Transmit = function(target, command) {
 	console.log('Sending data to Mic-array');
 	data[0] = target
 	data[1] = command
-	i2c1.i2cWrite(I2C_ADDRESS, BUFF_SIZE, data, function(err) {
+	i2c1.i2cWriteSync(I2C_ADDRESS, BUFF_SIZE, data, function(err) {
 		if (err) {
 			throw err;
 		}
@@ -40,6 +40,7 @@ exports.Receive = function() {
 		if (err) {
 			throw err;
 		}
+
 		console.log('Receiving data from Mic-array')
 		i2c1.i2cRead(I2C_ADDRESS, BUFF_SIZE, RxBuff, function(error) {
 			if(err) {
@@ -62,18 +63,19 @@ exports.dbus_interface_controller = function(service, obj_path, interface) {
 			if (err) {
 				throw err;
 			}
+
 			console.log('Receiving data from Mic-array')
-			i2c1.i2cRead(I2C_ADDRESS, BUFF_SIZE, RxBuff, function(error) {
+			i2c1.i2cReadSync(I2C_ADDRESS, BUFF_SIZE, RxBuff, function(error) {
 				if(err) {
 					throw err;
 				}
 			})
+
 			iface.buffer_handler(RxBuff[0], RxBuff[1], function(err) {
 				if(err)
 				{
-					console.log('Error I2C controller')
+					throw err
 				}
-				console.log('I2C controller')
 			})
 		})
 	})
