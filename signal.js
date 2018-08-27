@@ -1,14 +1,12 @@
-var dbus = require('dbus-native')
-var systemBus = dbus.systemBus()
+var dbus = require('dbus')
 
-systemBus.getService('org.olli.i2c1').getInterface('/org/olli/i2c1', 'org.olli.i2c1',
-    function(err, iface) {
-    if(err) {
-        throw err
-    }
+var bus = dbus.getBus('system')
 
-    iface.on('emitSignal', function() {
-        console.log('okayyy')
+bus.getInterface('org.olli.i2c1', '/org/olli/i2c1', 'org.olli.i2c1.event', function(err, iface) {
+    iface.buffer_handler(0x02, 0x03, function(err) {
+        if(err) {
+
+        }
+        console.log('enable i2c controller')
     })
 })
-

@@ -1,8 +1,4 @@
-var buff = new Buffer([0x00, 0x00])
-const i2c = require('./i2c.js')
+var i2c = require('./i2c-control.js')
 
-i2c.I2C_Transmit(0x03, 0x04)
-buff = i2c.I2C_Receive()
-// setInterval(function() {
-//   console.log(buff);
-// }, 5000);
+i2c.Transmit(0x32, 0x42)
+i2c.dbus_interface_controller('org.olli.i2c1', '/org/olli/i2c1', 'org.olli.i2c1.event')

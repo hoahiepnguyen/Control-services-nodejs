@@ -1,3 +1,5 @@
+var dbus = require('dbus')
+var bus = dbus.getBus('system')
 const i2c = require('i2c-bus');
 const gpio = require('onoff').Gpio
 
@@ -19,7 +21,7 @@ function pulse () {
 	pin67.writeSync(1)
 }
 
-exports.I2C_Transmit = function(target, command) {
+exports.Transmit = function(target, command) {
 	//create pulse before transmission
 	pulse()
 
@@ -33,7 +35,7 @@ exports.I2C_Transmit = function(target, command) {
 	})
 }
 
-exports.I2C_Receive = function() {
+exports.Receive = function() {
 	gpio48.watch((err, value) => {
 		if (err) {
 			throw err;
@@ -47,4 +49,32 @@ exports.I2C_Receive = function() {
 		})
 	})
 	return RxBuff;
+}
+
+exports.dbus_interface_controller = function(service, obj_path, interface) {
+	bus.getInterface(service, obj_path, interface, function(err, iface) {
+		if(err)
+		{
+			console.log('Can not get Interface from Dbus')
+		}
+
+		gpio48.watch((err, value) => {
+			if (err) {
+				throw err;
+			}
+			console.log('Receiving data from Mic-array')
+			i2c1.i2cRead(I2C_ADDRESS, BUFF_SIZE, RxBuff, function(error) {
+				if(err) {
+					throw err;
+				}
+			})
+			iface.buffer_handler(RxBuff[0], RxBuff[1], function(err) {
+				if(err)
+				{
+					console.log('Error I2C controller')
+				}
+				console.log('I2C controller')
+			})
+		})
+	})
 }
