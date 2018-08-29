@@ -20,15 +20,6 @@ const i2c1 = i2c.openSync(1)
 
 var myI2C = new EventEmitter()
 
-function mute() {
-	ioctl.Transmit(0x18, 0x00, 0x00)
-	ioctl.Transmit(0x18, 0x40, 0x0C)
-}
-
-function unmute() {
-	ioctl.Transmit(0x18, 0x00, 0x00)
-	ioctl.Transmit(0x18, 0x40, 0x00)
-}
 function Controller(target, command) {
 	if(target == LED_RING) {
 	}
