@@ -16,24 +16,25 @@ var RxBuff = new Buffer([0x00, 0x00]);
 const i2c1 = i2c.openSync(1)
 
 Promise.all(
-                [myEvents.on()]
-            )
-            .then(() => {
-                mcu_rst.reset()
-                gpio48.watch((err, value) => {
-                    if (err) {
-                        throw err;
-                    }
+				[myEvents.on()]
+			)
+			.then(() => {
+				mcu_rst.reset()
+				gpio48.watch((err, value) => {
+					if (err) {
+						throw err;
+					}
 
-                    //console.log('Receiving data from Mic-array')
-                    i2c1.i2cReadSync(I2C_ADDRESS, BUFF_SIZE, RxBuff, function(error) {
-                        if(err) {
-                            throw err;
-                        }
-                    })
-                    myEvents.emit(RxBuff[0], RxBuff[1])
-                })
-            })
-            .catch(function(err){
-                console.error(err)
-            })
+					//console.log('Receiving data from Mic-array')
+					i2c1.i2cReadSync(I2C_ADDRESS, BUFF_SIZE, RxBuff, function(error) {
+						if(err) {
+							mcu_rst.reset()
+							throw err;
+						}
+					})
+					myEvents.emit(RxBuff[0], RxBuff[1])
+				})
+			})
+			.catch(function(err){
+				console.error(err)
+			})

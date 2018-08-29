@@ -20,49 +20,60 @@ const i2c1 = i2c.openSync(1)
 
 var myI2C = new EventEmitter()
 
-
-function Controller(target, command)
-{
-    if(target == LED_RING) {
-    }
-    else if(target == MIC_ARRAY) {
-    }
-    else if(target == CYPRESS_BUTTON) {
-        switch(command) {
-            case VOLUME_UP:
-                ioctl.Transmit(0x02, 0x20, 0x06)
-                console.log('volume up')
-                break;
-            case VOLUME_DOWN:
-                ioctl.Transmit(0x02, 0x21, 0x03)
-                console.log('volume down')
-                break;
-            case VOLUME_MUTE:
-                ioctl.Transmit(0x02, 0x22, 0x00)
-                console.log('volume mute')
-                break;
-            case VOLUME_UNMUTE:
-                ioctl.Transmit(0x02, 0x25, 0x00)
-                console.log('volume unmute')
-                break;
-            case WAKE_WORD_START:
-            //recording audio
-                console.log('recording')
-                break;
-        }
-    }
+function mute() {
+	ioctl.Transmit(0x18, 0x00, 0x00)
+	ioctl.Transmit(0x18, 0x40, 0x0C)
 }
-function myEvents() {
-    var self = this
-    this.on = function() {
 
-        myI2C.on('i2c event', (target, command) => {
-            Controller(target, command)
-        })
-    }
-    this.emit = function(target, command){
-        myI2C.emit('i2c event', target, command)
-    }
+function unmute() {
+	ioctl.Transmit(0x18, 0x00, 0x00)
+	ioctl.Transmit(0x18, 0x40, 0x00)
+}
+function Controller(target, command) {
+	if(target == LED_RING) {
+	}
+	else if(target == MIC_ARRAY) {
+	}
+	else if(target == CYPRESS_BUTTON) {
+		switch(command) {
+			case VOLUME_UP:
+				ioctl.Transmit(CYPRESS_BUTTON, VOLUME_UP, 0x06)
+				console.log('volume up')
+				break;
+			case VOLUME_DOWN:
+				ioctl.Transmit(CYPRESS_BUTTON, VOLUME_DOWN, 0x03)
+				console.log('volume down')
+				break;
+			case VOLUME_MUTE:
+				//do something here
+				ioctl.mute()
+				ioctl.Transmit(CYPRESS_BUTTON, VOLUME_MUTE)
+				console.log('volume mute')
+				break;
+			case VOLUME_UNMUTE:
+				ioctl.unmute()
+				ioctl.Transmit(CYPRESS_BUTTON, VOLUME_UNMUTE)
+				console.log('volume unmute')
+				break;
+			case WAKE_WORD_START:
+				//recording audio
+				console.log('recording')
+				break;
+		}
+	}
+}
+
+function myEvents() {
+	var self = this
+	this.on = function() {
+
+		myI2C.on('i2c event', (target, command) => {
+			Controller(target, command)
+		})
+	}
+	this.emit = function(target, command){
+		myI2C.emit('i2c event', target, command)
+	}
 }
 
 module.exports = new myEvents()
