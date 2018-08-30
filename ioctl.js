@@ -3,8 +3,8 @@ const gpio = require('onoff').Gpio
 const delay = require('delay')
 
 const pin67 = new gpio(67, 'out')
-const pin66 = new gpio(66, 'out')
-
+//const pin66 = new gpio(66, 'out')
+var execFile = require('child_process').execFile
 const I2C_ADDRESS = 0x68;
 const BUFF_SIZE = 0x03
 const CODEC_ADDR = 0x18
@@ -17,15 +17,16 @@ const i2c1_forceAccess = i2c.openSync(1, {forceAccess: true})
 function pulse() {
 	pin67.writeSync(1)
 	pin67.writeSync(0)
+	delay(10)
 	pin67.writeSync(1)
 }
 
 exports.reset = function () {
-	pin66.writeSync(1)
-	delay(10)
-	pin66.writeSync(0)
-	delay(10)
-	pin66.writeSync(1)
+	execFile('/bin/bash', ['/home/root/reset.sh'], function(err, stdout, stderr) {
+   		if (err !== null) {
+      		console.log('exec error:', err);
+    	}
+	})
 }
 
 exports.Transmit = function(target, command, value) {
@@ -50,6 +51,7 @@ exports.mute = function() {
 	data[1] = 0x00
 	i2c1_forceAccess.i2cWriteSync(CODEC_ADDR, 0x02, data, function(err) {
 		if (err) {
+			reset()
 			throw err;
 		}
 	})
@@ -58,6 +60,7 @@ exports.mute = function() {
 	data[1] = 0x0C
 	i2c1_forceAccess.i2cWriteSync(CODEC_ADDR, 0x02, data, function(err) {
 		if (err) {
+			reset()
 			throw err;
 		}
 	})
@@ -69,6 +72,7 @@ exports.unmute = function() {
 	data[1] = 0x00
 	i2c1_forceAccess.i2cWriteSync(CODEC_ADDR, 0x02, data, function(err) {
 		if (err) {
+			reset()
 			throw err;
 		}
 	})
@@ -77,6 +81,7 @@ exports.unmute = function() {
 	data[1] = 0x00
 	i2c1_forceAccess.i2cWriteSync(CODEC_ADDR, 0x02, data, function(err) {
 		if (err) {
+			reset()
 			throw err;
 		}
 	})
