@@ -17,11 +17,8 @@ const WIFI_DISCONNECTED = 0x41
 
 var data = new Buffer([0x00, 0x00, 0x00])
 
-const i2c = require('i2c-bus');
 var ioctl = require('./ioctl')
 var EventEmitter = require('events').EventEmitter
-
-const i2c1 = i2c.openSync(1)
 
 var BufferEvents = new EventEmitter()
 
