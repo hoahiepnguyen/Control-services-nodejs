@@ -12,6 +12,9 @@ const WAKE_WORD_STOP = 0x24
 const VOLUME_UNMUTE = 0x25
 const MICROPHONE_MUTE = 0x26
 const MICROPHONE_UNMUTE = 0x27
+const WIFI_CONNECTED = 0x40
+const WIFI_DISCONNECTED = 0x41
+
 var data = new Buffer([0x00, 0x00, 0x00])
 
 const i2c = require('i2c-bus');
@@ -21,10 +24,6 @@ var EventEmitter = require('events').EventEmitter
 const i2c1 = i2c.openSync(1)
 
 var BufferEvents = new EventEmitter()
-
-
-//var button = new EventEmitter()
-//var led_ring = new EventEmitter()
 
 BufferEvents.on('button', (command)=> {
 	switch(command) {
@@ -37,7 +36,6 @@ BufferEvents.on('button', (command)=> {
 			console.log('volume down')
 			break;
 		case VOLUME_MUTE:
-			//do something here
 			ioctl.mute()
 			ioctl.Transmit(CYPRESS_BUTTON, VOLUME_MUTE)
 			console.log('volume mute')
@@ -62,20 +60,40 @@ BufferEvents.on('button', (command)=> {
 	}
 })
 
-BufferEvents.on('led_ring', (command) => {
+BufferEvents.on('led ring', (command) => {
 	switch(command) {
 
+	}
+})
+
+BufferEvents.on('user event', (command) => {
+	switch(command)
+	{
+		case WIFI_CONNECTED:
+			ioctl.Transmit(USER_EVENT, WIFI_CONNECTED)
+			console.log('wifi was connected')
+			break;
+		case WIFI_DISCONNECTED:
+			ioctl.Transmit(USER_EVENT, WIFI_DISCONNECTED)
+			console.log('wifi was disconnected')
+			break;
+		case WAKE_WORD_STOP:
+			ioctl.Transmit(USER_EVENT, WAKE_WORD_STOP)
+			console.log('wakeword end')
+			break;
 	}
 })
 
 function Controller(target, command) {
 	switch(target) {
 		case LED_RING:
-			BufferEvents.emit('led_ring', command)
+			BufferEvents.emit('led ring', command)
 			break;
 		case CYPRESS_BUTTON:
 			BufferEvents.emit('button', command)
 			break;
+		case USER_EVENT:
+			BufferEvents.emit('user event', command)
 	}
 }
 
