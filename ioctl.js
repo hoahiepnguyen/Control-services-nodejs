@@ -21,11 +21,11 @@ function pulse() {
 	pin67.writeSync(1)
 }
 
-exports.reset = function () {
+function reset() {
 	execFile('/bin/bash', ['/home/root/reset.sh'], function(err, stdout, stderr) {
-   		if (err !== null) {
-      		console.log('exec error:', err);
-    	}
+		if (err !== null) {
+			console.log('exec error:', err);
+		}
 	})
 }
 
@@ -86,3 +86,5 @@ exports.unmute = function() {
 		}
 	})
 }
+
+module.exports.reset = reset
