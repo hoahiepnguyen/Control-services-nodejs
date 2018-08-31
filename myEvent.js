@@ -77,6 +77,13 @@ BufferEvents.on('user event', (command) => {
 		case WAKE_WORD_STOP:
 			ioctl.Transmit(USER_EVENT, WAKE_WORD_STOP)
 			console.log('wakeword end')
+		case MICROPHONE_MUTE:
+			ioctl.Transmit(USER_EVENT, MICROPHONE_MUTE)
+			console.log('microphone mute')
+			break;
+		case MICROPHONE_UNMUTE:
+			ioctl.Transmit(USER_EVENT, MICROPHONE_UNMUTE)
+			console.log('microphone unmute')
 			break;
 	}
 })
